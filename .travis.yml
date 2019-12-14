@@ -1,0 +1,24 @@
+sudo: required
+services:
+    - docker
+before_install:
+    - docker build -t pjcubero/react-test -f ./client/Dockerfile.dev ./client     
+script:
+    - docker run -e CI=true pjcubero/react-test npm run test    
+
+after_success:
+    - docker build -t pjcubero/multi-client ./client
+    - docker build -t pjcubero/multi-nginx ./nginx
+    - docker build -t pjcubero/multi-server ./server
+    - docker build -t pjcubero/multi-worker ./worker
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+    - docker push pjcubero/multi-client
+    - docker push pjcubero/multi-nginx
+    - docker push pjcubero/multi-server
+    - docker push pjcubero/multi-worker
+    
+
+    
+    
+    
+
